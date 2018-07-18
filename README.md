@@ -1,0 +1,2 @@
+# Thingworx-Websocket
+Websocket implementation
