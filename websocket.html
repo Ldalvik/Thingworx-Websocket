@@ -1,0 +1,154 @@
+<html>
+<style>
+input {
+    border: 1px solid black;
+    border-radius: 2px;
+	margin: 5px;
+}
+
+button {
+    border: 1px solid black;
+    border-radius: 2px;
+	background-color: white;
+	margin: 5px;
+}
+
+button:active {
+	background-color: #808080;
+}
+
+#textbox {
+    border: 2px solid black;
+    border-radius: 5px;
+	margin-left: 550px;   
+	margin-right: 550px;   
+	margin-top: 5px;   
+	margin-bottom: 5px;   
+	padding-top: 10px;   
+	padding-bottom: 10px;   
+}
+</style>
+<body>
+<center>
+
+<button onclick="addText()">Add Text</button><br>
+<!--<button onclick="addImage()">Add Image</button><br>-->
+<div id="textViews"></div>
+<center>
+</body>
+<script>  
+	var ws = new WebSocket("ws://130.64.160.230:8080"); 
+    var interval;      
+	var addedId=0;   
+
+	var left = document.getElementById("left");
+	var right = document.getElementById("right");
+	var up = document.getElementById("up");
+	var down = document.getElementById("down");
+	var size = document.getElementById("size");
+	var text = document.getElementById("text");
+
+	
+	//text.onkeypress = function(){
+	//	changeText();
+	//}
+	
+	//size.onkeypress = function(){
+		//changeSize();
+	//}
+	
+	/*left.onmousedown = function() {
+		interval = setInterval(function(){ moveLeft(); }, 250);
+	};
+	left.onmouseup = function() {
+		clearInterval(interval);
+	};
+	
+	right.onmousedown = function() {
+		interval = setInterval(function(){ moveRight(); }, 250);
+	};
+	right.onmouseup = function() {
+		clearInterval(interval);
+	};
+	
+	up.onmousedown = function() {
+		interval = setInterval(function(){ moveUp(); }, 250);
+	};
+	up.onmouseup = function() {
+		clearInterval(interval);
+	};
+	
+	down.onmousedown = function() {
+		interval = setInterval(function(){ moveDown(); }, 250);
+	};
+	down.onmouseup = function() {
+		clearInterval(interval);
+	};*/
+ 
+  var textInfo = new Array();
+  
+  function moveLeft(id){
+	var _x = textInfo[id].x - 5;
+	textInfo[id].x = _x;
+	ws.send('updateText:x=' + textInfo[id].x + '&id=' + id);
+	}
+  
+  function moveRight(id){
+	var _x = textInfo[id].x + 5;
+	textInfo[id].x = _x;
+	ws.send('updateText:x=' + textInfo[id].x + '&id=' + id);
+	}	
+	
+  function moveDown(id){
+	var _y = textInfo[id].y + 5;
+	textInfo[id].y = _y;
+	ws.send('updateText:y=' + textInfo[id].y + '&id=' + id);
+ }
+ 
+  function moveUp(id){
+	var _y = textInfo[id].y - 5;
+	textInfo[id].y = _y;
+	ws.send('updateText:y=' + textInfo[id].y + '&id=' + id);
+ }
+  
+  function addText(){
+	document.getElementById("textViews").innerHTML += '<div id="' + addedId + '"><center><div id="textbox"><p>Text ID: ' + addedId + '</p><input type="text" placeholder="color" value="255,0,0" id="color' + addedId + '" /><br><input type="number" placeholder="size" value="15" id="size' + addedId + '" /><br><input type="text" placeholder="text" value="text" id="text' + addedId + '" /><br><button onclick="deleteText(' + addedId + ')">Delete Text</button><br><button onclick="changeSize(' + addedId + ')">Change Size</button><br><button onclick="changeColor(' + addedId + ')">Change Color</button><br><button onclick="changeText(' + addedId + ')">Change Text</button><br><button onclick="moveUp(' + addedId + ')" id="up">&uarr;</button><br><button onclick="moveLeft(' + addedId + ')" id="left">&larr;</button><button onclick="moveRight(' + addedId + ')" id="right">&rarr;</button><br><button onclick="moveDown(' + addedId + ')" id="down">&darr;</button></div><center></div>';
+	textInfo[addedId] = {x:50, y:50, text:'text', color:'255,0,0', size:'15'};
+	ws.send('addText:text=' + textInfo[addedId].text + '&x=' + textInfo[addedId].x + '&y=' + textInfo[addedId].y + '&size=' + textInfo[addedId].size + '&color=' + textInfo[addedId].color + '&id=' + addedId);
+    addedId++;
+  }
+  
+  function addImage(){
+	document.getElementById("textViews").innerHTML += '<div id="' + addedId + '"><center><br><div id="textbox"><p>Image ID: ' + addedId + '</p><button onclick="deleteImage(' + addedId + ')">Delete Image</button><br><button onclick="changeImage(' + addedId + ')">Change Image</button><br><button onclick="moveUp(' + addedId + ')" id="up">&uarr;</button><br><button onclick="moveLeft(' + addedId + ')" id="left">&larr;</button><button onclick="moveRight(' + addedId + ')" id="right">&rarr;</button><br><button onclick="moveDown(' + addedId + ')" id="down">&darr;</button></div><center></div>';
+	textInfo[addedId] = {x:50, y:50, text:'text', color:'255,0,0', size:'15'};
+	ws.send('addText:text=' + textInfo[addedId].text + '&x=' + textInfo[addedId].x + '&y=' + textInfo[addedId].y + '&size=' + textInfo[addedId].size + '&color=' + textInfo[addedId].color + '&id=' + addedId);
+    addedId++;
+  }
+  
+  function changeText(id){
+	var _text = document.getElementById('text' + id).value;
+    textInfo[id].text = _text;
+	ws.send('updateText:text=' + textInfo[id].text + '&id=' + id);
+  }
+  
+  function changeColor(id){
+	var _color = document.getElementById('color' + id).value;
+    textInfo[id].color = _color;
+	ws.send('updateText:color=' + textInfo[id].color + '&id=' + id);
+  }
+  
+  function changeSize(id){
+	var _size = document.getElementById('size' + id).value;
+    textInfo[id].size = _size;
+	ws.send('updateText:size=' + textInfo[id].size + '&id=' + id);
+  }
+  
+  function deleteText(id){
+  document.getElementById(id).remove();
+    textInfo[id] = {};
+	ws.send('deleteText:id=' + id);
+  }
+
+</script>
+
+</html>
